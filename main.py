@@ -14,10 +14,12 @@ __version__ = '1.0.0'
 def download(playlist_url: str, dest_folder: Path):
     ydl_opts = {
         # 'playlistend': 3,
+        'skip_download': True,
         'writesubtitles': True,
         'writeautomaticsub': True,
-        'subtitlesformat': 'vtt',
+        'subtitlesformat': 'ttml',
         'outtmpl': f'{dest_folder}\\{youtube_yl.DEFAULT_OUTTMPL}',
+        'ignoreerrors': True,
     }
 
     with youtube_yl.YoutubeDL(ydl_opts) as ydl:
@@ -48,8 +50,8 @@ def main():
     parser.add_argument('--version', action='version', version=__version__)
     parser.parse_args()
 
-    base_folder = Path('botnik_boards')
-    # todo: change
+    base_folder = Path('botnik-boards')
+    # todo: change?
     playlist_folder = base_folder
     dest_folder = playlist_folder / 'download'
     dest_folder.mkdir(parents=True, exist_ok=True)
