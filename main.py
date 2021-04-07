@@ -12,11 +12,33 @@ __version__ = '1.0.0'
 
 
 def download(playlist_url: str, dest_folder: Path):
-    pass
+    ydl_opts = {
+        # 'playlistend': 3,
+        'writesubtitles': True,
+        'writeautomaticsub': True,
+        'subtitlesformat': 'vtt',
+        'outtmpl': f'{dest_folder}\\{youtube_yl.DEFAULT_OUTTMPL}',
+    }
+
+    with youtube_yl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([playlist_url])
 
 
-def merge_subtitles(sub_folder: Path, dest_file: Path):
-    pass
+def merge_subtitle_file(sub_file_path: Path) -> str:
+    with open(sub_file_path) as sub_file:
+        subs = BeautifulSoup(sub_file, 'html.parser')
+
+    subs_strings = []
+    for sub in subs.find_all('p'):
+        subs_strings.append(sub.string)
+
+    return '\n'.join(subs_strings)
+
+
+def merge_subtitles_in_folder(sub_folder: Path, dest_file_path: Path):
+    with open(dest_file_path, 'w') as dest_file:
+        for sub_file in sub_folder.iterdir():
+            dest_file.write(merge_subtitle_file(sub_file))
 
 
 def main():
@@ -36,7 +58,7 @@ def main():
     download(playlist_url, dest_folder)
 
     print('Processing..')
-    merge_subtitles(dest_folder, dest_file)
+    merge_subtitles_in_folder(dest_folder, dest_file)
     print(
         'Done!\n'
         f'Created file {dest_file}\n'
