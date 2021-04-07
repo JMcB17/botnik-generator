@@ -27,18 +27,19 @@ def download(playlist_url: str, dest_folder: Path):
 
 
 def merge_subtitle_file(sub_file_path: Path) -> str:
-    with open(sub_file_path) as sub_file:
+    with open(sub_file_path, encoding='utf-8') as sub_file:
         subs = BeautifulSoup(sub_file, 'html.parser')
 
     subs_strings = []
     for sub in subs.find_all('p'):
-        subs_strings.append(sub.string)
+        subs_strings.append('\n'.join(sub.strings))
+    subs_strings.append('\n')
 
     return '\n'.join(subs_strings)
 
 
 def merge_subtitles_in_folder(sub_folder: Path, dest_file_path: Path):
-    with open(dest_file_path, 'w') as dest_file:
+    with open(dest_file_path, 'w', encoding='utf-8') as dest_file:
         for sub_file in sub_folder.iterdir():
             dest_file.write(merge_subtitle_file(sub_file))
 
