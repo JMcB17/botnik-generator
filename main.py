@@ -42,8 +42,10 @@ def merge_subtitles_in_folder(sub_folder: Path, dest_file_path: Path):
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(name='--version', action='version', version=__version__)
+    parser = argparse.ArgumentParser(
+        description='Create a new Botnik AI predictive keyboard from a youtube playlist by downloading its subtitles.'
+    )
+    parser.add_argument('--version', action='version', version=__version__)
     parser.parse_args()
 
     base_folder = Path('botnik_boards')
