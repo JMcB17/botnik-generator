@@ -11,7 +11,8 @@ from bs4 import BeautifulSoup
 __version__ = '1.0.0'
 
 
-def download(playlist_url: str, dest_folder: Path):
+# todo: speed up somehow with threading?
+def download(playlist_url: str, dest_folder: Path, lang: str = None):
     ydl_opts = {
         # 'playlistend': 3,
         'skip_download': True,
@@ -21,6 +22,8 @@ def download(playlist_url: str, dest_folder: Path):
         'outtmpl': f'{dest_folder}\\{youtube_yl.DEFAULT_OUTTMPL}',
         'ignoreerrors': True,
     }
+    if lang:
+        ydl_opts['subtitleslangs'] = [lang]
 
     with youtube_yl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([playlist_url])
@@ -49,7 +52,9 @@ def main():
         description='Create a new Botnik AI predictive keyboard from a youtube playlist by downloading its subtitles.'
     )
     parser.add_argument('--version', action='version', version=__version__)
-    parser.parse_args()
+    parser.add_argument('playlist_url', nargs='?')
+    parser.add_argument('-l', '--lang', help='the subtitle language to download as a two-letter code e.g. en (english)')
+    args = parser.parse_args()
 
     base_folder = Path('botnik-boards')
     # todo: change?
@@ -58,9 +63,12 @@ def main():
     dest_folder.mkdir(parents=True, exist_ok=True)
     dest_file = base_folder / 'board.txt'
 
-    playlist_url = input('Playlist url: ')
+    if args.playlist_url:
+        playlist_url = args.playlist_url
+    else:
+        playlist_url = input('Playlist url: ')
     print('Downloading...')
-    download(playlist_url, dest_folder)
+    download(playlist_url, dest_folder, args.lang)
 
     print('Processing..')
     merge_subtitles_in_folder(dest_folder, dest_file)
