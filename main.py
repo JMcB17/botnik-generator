@@ -47,6 +47,12 @@ def merge_subtitles_in_folder(sub_folder: Path, dest_file_path: Path):
             dest_file.write(merge_subtitle_file(sub_file))
 
 
+def shorten_file(source_file_path: Path, dest_file_path: Path, limit: int = 10**6):
+    with open(dest_file_path, 'w', encoding='utf-8') as dest_file:
+        with open(source_file_path, encoding='utf-8') as source_file:
+            dest_file.writelines(source_file.readlines(limit))
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Create a new Botnik AI predictive keyboard from a youtube playlist by downloading its subtitles.'
@@ -64,6 +70,7 @@ def main():
     if args.folder:
         playlist_folder_name = args.folder
     else:
+        # todo: check this with regex?
         playlist_folder_name = input('Output folder name: ')
 
     current_folder = Path().resolve()
@@ -75,12 +82,14 @@ def main():
     dest_folder = playlist_folder / 'download'
     dest_folder.mkdir(parents=True, exist_ok=True)
     dest_file = base_folder / 'board.txt'
+    dest_file_1m = dest_file.with_stem(dest_file.stem + '-1MB')
 
     print('Downloading...')
     download(playlist_url, dest_folder, args.lang)
 
     print('Processing..')
     merge_subtitles_in_folder(dest_folder, dest_file)
+    shorten_file(dest_file, dest_file_1m)
     print(
         'Done!\n'
         f'Created file {dest_file}\n'
