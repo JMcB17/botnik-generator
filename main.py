@@ -82,14 +82,14 @@ def main():
     dest_folder = playlist_folder / 'download'
     dest_folder.mkdir(parents=True, exist_ok=True)
     dest_file = base_folder / 'board.txt'
-    dest_file_1m = dest_file.with_stem(dest_file.stem + '-1MB')
+    dest_file_1m = dest_file.with_stem(dest_file.stem + '-500kB')
 
     print('Downloading...')
     download(playlist_url, dest_folder, args.lang)
 
     print('Processing..')
     merge_subtitles_in_folder(dest_folder, dest_file)
-    shorten_file(dest_file, dest_file_1m)
+    shorten_file(dest_file, dest_file_1m, (10**6)//2)
     print(
         'Done!\n'
         f'Created file {dest_file}\n'
