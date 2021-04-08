@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 import argparse
 from pathlib import Path
 
@@ -8,7 +7,8 @@ import youtube_dl as youtube_yl
 from bs4 import BeautifulSoup
 
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
+BASE_FOLDER_NAME = 'botnik-boards'
 
 
 # todo: speed up somehow with threading?
@@ -54,19 +54,28 @@ def main():
     parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('playlist_url', nargs='?')
     parser.add_argument('-l', '--lang', help='the subtitle language to download as a two-letter code e.g. en (english)')
+    parser.add_argument('-f', '--folder', help='name of the folder to download to, will be created if not exists')
     args = parser.parse_args()
-
-    base_folder = Path('botnik-boards')
-    # todo: change?
-    playlist_folder = base_folder
-    dest_folder = playlist_folder / 'download'
-    dest_folder.mkdir(parents=True, exist_ok=True)
-    dest_file = base_folder / 'board.txt'
 
     if args.playlist_url:
         playlist_url = args.playlist_url
     else:
         playlist_url = input('Playlist url: ')
+    if args.folder:
+        playlist_folder_name = args.folder
+    else:
+        playlist_folder_name = input('Output folder name: ')
+
+    current_folder = Path().resolve()
+    if current_folder.name == BASE_FOLDER_NAME:
+        base_folder = current_folder
+    else:
+        base_folder = Path(BASE_FOLDER_NAME)
+    playlist_folder = base_folder / playlist_folder_name
+    dest_folder = playlist_folder / 'download'
+    dest_folder.mkdir(parents=True, exist_ok=True)
+    dest_file = base_folder / 'board.txt'
+
     print('Downloading...')
     download(playlist_url, dest_folder, args.lang)
 
